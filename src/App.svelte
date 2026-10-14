@@ -1,170 +1,270 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { gsap } from 'gsap';
   import Observer from 'gsap/Observer';
   import Background from './Background.svelte';
   import Logo from './Logo.svelte';
   import { BRAND } from './lib/brand';
 
+  // Top-level plugin registration: done once for the module, outside any lifecycle.
+  gsap.registerPlugin(Observer);
+
   let view: 'home' | 'menu' | 'about' = 'home';
   let page: HTMLElement;
   let reduced = false;
   let resumeHome: () => void = () => {};
+  let leaveHome: () => void = () => {};
 
-  function show(next: 'home' | 'menu' | 'about'): void {
+  async function show(next: 'home' | 'menu' | 'about'): Promise<void> {
+    const wasHome = view === 'home';
     view = next;
-    if (next === 'home') requestAnimationFrame(() => resumeHome());
+    // Leaving home: revert the GSAP context while the old DOM is still mounted.
+    if (wasHome && next !== 'home') leaveHome();
+    // Returning home: wait for Svelte to flush the DOM, then rebuild the context.
+    if (next === 'home' && !wasHome) {
+      await tick();
+      resumeHome();
+    }
   }
 
   onMount(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     reduced = media.matches;
-    gsap.registerPlugin(Observer);
-    const story = page.querySelector<HTMLElement>('[data-story-section]');
-    const storyLines = story ? [...story.querySelectorAll<HTMLElement>('[data-story-line]')] : [];
-    let slides = [...page.querySelectorAll<HTMLElement>('[data-page-section]')];
-    let currentIndex = 0;
-    let locked = false;
+
+    // Navigation state shared between rebuilds so the keyboard fallback keeps
+    // working in reduced-motion mode (where Observer is never created).
+    const nav = {
+      slides: [] as HTMLElement[],
+      currentIndex: 0,
+      locked: false,
+      move: null as null | ((direction: number, axis?: 'vertical' | 'horizontal') => void),
+      jump: null as null | ((index: number, direction: number) => void),
+      inFeatures: (): boolean => false,
+    };
+
     const isInteractive = (event: Event | undefined): boolean => {
       const target = event?.target as HTMLElement | null;
       return !!target?.closest('input, textarea, select, [contenteditable="true"], button, a, .menu-panel, .about-panel');
     };
-    const reveal = (slide: HTMLElement): void => {
-      const content = slide.querySelectorAll('[data-reveal]');
-      if (reduced) { gsap.set(content, { clearProps: 'all' }); return; }
-      gsap.fromTo(content, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: .72, stagger: .1, ease: 'power3.out', overwrite: true });
-      slide.querySelectorAll<SVGGeometryElement>('path, circle').forEach((shape) => {
-        if (typeof shape.getTotalLength !== 'function') return;
-        const length = shape.getTotalLength();
-        gsap.set(shape, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
-        gsap.to(shape, { strokeDashoffset: 0, opacity: 1, duration: .95, ease: 'power2.out', overwrite: true });
-      });
-    };
-    const activate = (index: number, direction = 1, axis: 'vertical' | 'horizontal' = 'vertical'): void => {
-      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
-      slides.forEach((slide, i) => {
-        slide.classList.toggle('is-active', i === currentIndex);
-        slide.setAttribute('aria-hidden', i === currentIndex ? 'false' : 'true');
-        gsap.set(slide, { autoAlpha: i === currentIndex ? 1 : 0, zIndex: i === currentIndex ? 2 : 0 });
-      });
-      const active = slides[currentIndex];
-      if (!active) return;
-      active.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => {
-        element.style.opacity = '1';
-      });
-      if (!reduced) {
-        const movement = axis === 'horizontal' ? { xPercent: direction > 0 ? 10 : -10 } : { yPercent: direction > 0 ? 10 : -10 };
-        const settle = axis === 'horizontal' ? { xPercent: 0 } : { yPercent: 0 };
-        gsap.fromTo(active, { ...movement, opacity: .35 }, { ...settle, opacity: 1, duration: 1, ease: 'power3.out', overwrite: true });
-        reveal(active);
-      } else reveal(active);
-    };
-    const refreshHome = (): void => {
-      slides = [...page.querySelectorAll<HTMLElement>('[data-page-section]')];
-      if (!slides.length) return;
-      activate(currentIndex, 1);
-      updateStory();
-    };
-    const move = (direction: number, axis: 'vertical' | 'horizontal' = 'vertical'): void => {
-      if (locked || view !== 'home') return;
-      const next = currentIndex + direction;
-      if (next < 0 || next >= slides.length) return;
-      locked = true;
-      const current = slides[currentIndex];
-      const target = slides[next];
-      const timeline = gsap.timeline({ onComplete: () => { locked = false; } });
-      if (reduced) {
-        activate(next, direction);
-        locked = false;
-        return;
-      }
-      const axisProp = axis === 'horizontal' ? 'xPercent' : 'yPercent';
-      const neutralAxis = axis === 'horizontal' ? { yPercent: 0 } : { xPercent: 0 };
-      timeline.set(current, neutralAxis, 0)
-        .to(current, { [axisProp]: direction > 0 ? -10 : 10, opacity: 0, duration: .7, ease: 'power2.inOut' }, 0)
-        .add(() => { activate(next, direction, axis); gsap.set(target, { ...neutralAxis, [axisProp]: direction > 0 ? 10 : -10, opacity: 0 }); }, .22)
-        .to(target, { [axisProp]: 0, opacity: 1, duration: .95, ease: 'power3.out' }, .24);
-    };
-    const updateStory = (): void => {
-      if (!story || !storyLines.length) return;
-    };
-    const svgElements = [...page.querySelectorAll<SVGSVGElement>('.visual svg, .review-visual svg, .progress-ring svg')];
-    const svgPaths = svgElements.flatMap((svg) => [...svg.querySelectorAll<SVGGeometryElement>('path, circle')]);
-    if (!reduced) {
-      svgPaths.forEach((shape) => {
-        if (typeof shape.getTotalLength !== 'function') return;
-        const length = shape.getTotalLength();
-        shape.style.strokeDasharray = `${length}`;
-        shape.style.strokeDashoffset = `${length}`;
-        shape.style.opacity = '0';
-      });
-    }
-    const svgObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const shapes = [...entry.target.querySelectorAll<SVGGeometryElement>('path, circle')];
-      if (!reduced) gsap.to(shapes, { strokeDashoffset: 0, opacity: 1, scale: 1, transformOrigin: 'center', duration: 1.35, stagger: 0.08, ease: 'power2.out', overwrite: true });
-        else gsap.set(shapes, { clearProps: 'all' });
-        svgObserver.unobserve(entry.target);
-      }
-    }, { threshold: 0.35 });
-    svgElements.forEach((svg) => svgObserver.observe(svg));
 
-    activate(0, 1);
-    const featureStart = 5;
-    const featureEnd = 8;
-    const inFeatures = (): boolean => currentIndex >= featureStart && currentIndex <= featureEnd;
-    const sectionObserver = Observer.create({
-      target: window,
-      type: 'wheel,touch,pointer',
-      wheelSpeed: 1,
-      tolerance: 10,
-      lockAxis: true,
-      preventDefault: true,
-      onDown: (self) => { if (!isInteractive(self.event)) move(inFeatures() && currentIndex < featureEnd ? 1 : 1, inFeatures() && currentIndex < featureEnd ? 'horizontal' : 'vertical'); },
-      onUp: (self) => { if (!isInteractive(self.event)) move(inFeatures() && currentIndex > featureStart ? -1 : -1, inFeatures() && currentIndex > featureStart ? 'horizontal' : 'vertical'); },
-      onLeft: (self) => { if (!isInteractive(self.event) && inFeatures() && currentIndex < featureEnd) move(1, 'horizontal'); },
-      onRight: (self) => { if (!isInteractive(self.event) && inFeatures() && currentIndex > featureStart) move(-1, 'horizontal'); },
-    });
-    resumeHome = refreshHome;
-    let touchX = 0;
-    let touchY = 0;
-    const fallbackWheel = (event: WheelEvent): void => {
-      if (view !== 'home' || isInteractive(event) || Math.abs(event.deltaY) < 10) return;
-      event.preventDefault();
-      const horizontal = inFeatures() && (event.deltaY !== 0 || event.deltaX !== 0);
-      const delta = event.deltaX || event.deltaY;
-      move(delta > 0 ? 1 : -1, horizontal && ((delta > 0 && currentIndex < featureEnd) || (delta < 0 && currentIndex > featureStart)) ? 'horizontal' : 'vertical');
-    };
-    const fallbackTouchStart = (event: TouchEvent): void => { touchX = event.touches[0]?.clientX ?? 0; touchY = event.touches[0]?.clientY ?? 0; };
-    const fallbackTouchEnd = (event: TouchEvent): void => {
-      if (view !== 'home' || isInteractive(event)) return;
-      const deltaX = touchX - (event.changedTouches[0]?.clientX ?? touchX);
-      const deltaY = touchY - (event.changedTouches[0]?.clientY ?? touchY);
-      if (inFeatures() && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) >= 24) move(deltaX > 0 ? 1 : -1, 'horizontal');
-      else if (Math.abs(deltaY) >= 24) move(deltaY > 0 ? 1 : -1, 'vertical');
-    };
-    window.addEventListener('wheel', fallbackWheel, { passive: false });
-    window.addEventListener('touchstart', fallbackTouchStart, { passive: true });
-    window.addEventListener('touchend', fallbackTouchEnd, { passive: true });
+    // Persistent keyboard navigation (works with and without Observer).
     const keyHandler = (event: KeyboardEvent): void => {
-      if (view !== 'home' || isInteractive(event)) return;
-      if (event.key === 'Home') { event.preventDefault(); if (!locked) activate(0, -1); return; }
-      if (event.key === 'End') { event.preventDefault(); if (!locked) activate(slides.length - 1, 1); return; }
+      if (view !== 'home' || isInteractive(event) || !nav.move) return;
+      if (event.key === 'Home') { event.preventDefault(); if (!nav.locked && nav.jump) nav.jump(0, -1); return; }
+      if (event.key === 'End') { event.preventDefault(); if (!nav.locked && nav.jump) nav.jump(nav.slides.length - 1, 1); return; }
       const direction = ['ArrowDown', 'PageDown'].includes(event.key) ? 1 : ['ArrowUp', 'PageUp'].includes(event.key) ? -1 : 0;
-      if (inFeatures() && event.key === 'ArrowRight') { event.preventDefault(); move(1, 'horizontal'); return; }
-      if (inFeatures() && event.key === 'ArrowLeft') { event.preventDefault(); move(-1, 'horizontal'); return; }
-      if (direction) { event.preventDefault(); move(direction); }
+      if (nav.inFeatures() && event.key === 'ArrowRight') { event.preventDefault(); nav.move(1, 'horizontal'); return; }
+      if (nav.inFeatures() && event.key === 'ArrowLeft') { event.preventDefault(); nav.move(-1, 'horizontal'); return; }
+      if (direction) { event.preventDefault(); nav.move(direction); }
     };
     window.addEventListener('keydown', keyHandler);
-    updateStory();
-    window.addEventListener('scroll', updateStory, { passive: true });
-    window.addEventListener('resize', updateStory, { passive: true });
-    const motionChange = (event: MediaQueryListEvent): void => { reduced = event.matches; };
+
+    let cleanup: (() => void) | null = null;
+
+    const build = (): void => {
+      if (!page || cleanup) return;
+      const story = page.querySelector<HTMLElement>('[data-story-section]');
+      const storyLines = story ? [...story.querySelectorAll<HTMLElement>('[data-story-line]')] : [];
+      let slides = [...page.querySelectorAll<HTMLElement>('[data-page-section]')];
+      let currentIndex = nav.currentIndex;
+      let locked = false;
+      const featureStart = 5;
+      const featureEnd = 8;
+      const inFeatures = (): boolean => currentIndex >= featureStart && currentIndex <= featureEnd;
+
+      let sectionObserver: Observer | null = null;
+      let svgObserver: IntersectionObserver | null = null;
+      const disposers: Array<() => void> = [];
+
+      const ctx = gsap.context(() => {
+        const reveal = (slide: HTMLElement): void => {
+          const content = slide.querySelectorAll('[data-reveal]');
+          if (reduced) { gsap.set(content, { clearProps: 'all' }); return; }
+          gsap.fromTo(content,
+            { opacity: 0, y: 26, willChange: 'transform, opacity' },
+            { opacity: 1, y: 0, duration: .72, stagger: .1, ease: 'power3.out', onComplete: () => gsap.set(content, { clearProps: 'willChange' }) });
+          slide.querySelectorAll<SVGGeometryElement>('path, circle').forEach((shape) => {
+            if (typeof shape.getTotalLength !== 'function') return;
+            const length = shape.getTotalLength();
+            // Explicit fromTo: start/end states defined here, not via earlier inline styles.
+            gsap.fromTo(shape,
+              { strokeDasharray: length, strokeDashoffset: length, opacity: 0, willChange: 'transform, opacity' },
+              { strokeDashoffset: 0, opacity: 1, duration: .95, ease: 'power2.out', onComplete: () => gsap.set(shape, { clearProps: 'willChange' }) });
+          });
+        };
+        const activate = (index: number, direction = 1, axis: 'vertical' | 'horizontal' = 'vertical'): void => {
+          currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+          nav.currentIndex = currentIndex;
+          slides.forEach((slide, i) => {
+            slide.classList.toggle('is-active', i === currentIndex);
+            slide.setAttribute('aria-hidden', i === currentIndex ? 'false' : 'true');
+            gsap.set(slide, { autoAlpha: i === currentIndex ? 1 : 0, zIndex: i === currentIndex ? 2 : 0 });
+          });
+          const active = slides[currentIndex];
+          if (!active) return;
+          if (!reduced) {
+            const movement = axis === 'horizontal' ? { xPercent: direction > 0 ? 10 : -10 } : { yPercent: direction > 0 ? 10 : -10 };
+            const settle = axis === 'horizontal' ? { xPercent: 0 } : { yPercent: 0 };
+            gsap.fromTo(active, { ...movement, opacity: .35, willChange: 'transform, opacity' }, { ...settle, opacity: 1, duration: 1, ease: 'power3.out', onComplete: () => gsap.set(active, { clearProps: 'willChange' }) });
+          }
+          reveal(active);
+        };
+        const move = (direction: number, axis: 'vertical' | 'horizontal' = 'vertical'): void => {
+          if (locked || view !== 'home') return;
+          const next = currentIndex + direction;
+          if (next < 0 || next >= slides.length) return;
+          locked = true;
+          nav.locked = true;
+          const current = slides[currentIndex];
+          const target = slides[next];
+          if (reduced) {
+            activate(next, direction);
+            locked = false;
+            nav.locked = false;
+            return;
+          }
+          const axisProp = axis === 'horizontal' ? 'xPercent' : 'yPercent';
+          const neutralAxis = axis === 'horizontal' ? { yPercent: 0 } : { xPercent: 0 };
+          const timeline = gsap.timeline({ onComplete: () => { locked = false; nav.locked = false; gsap.set([current, target], { clearProps: 'willChange' }); } });
+          timeline.set(current, { ...neutralAxis, willChange: 'transform, opacity' }, 0)
+            .to(current, { [axisProp]: direction > 0 ? -10 : 10, opacity: 0, duration: .7, ease: 'power2.inOut' }, 0)
+            .add(() => { activate(next, direction, axis); gsap.set(target, { ...neutralAxis, [axisProp]: direction > 0 ? 10 : -10, opacity: 0, willChange: 'transform, opacity' }); }, .22)
+            .to(target, { [axisProp]: 0, opacity: 1, duration: .95, ease: 'power3.out' }, .24);
+        };
+        const updateStory = (): void => {
+          if (!story || !storyLines.length) return;
+        };
+
+        // Pre-hide SVG shapes via gsap.set inside the context so a revert
+        // restores their original (CSS-defined) state — no manual inline styles.
+        const svgElements = [...page.querySelectorAll<SVGSVGElement>('.visual svg, .review-visual svg, .progress-ring svg')];
+        const svgPaths = svgElements.flatMap((svg) => [...svg.querySelectorAll<SVGGeometryElement>('path, circle')]);
+        if (!reduced) {
+          svgPaths.forEach((shape) => {
+            if (typeof shape.getTotalLength !== 'function') return;
+            const length = shape.getTotalLength();
+            gsap.set(shape, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
+          });
+        }
+        svgObserver = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const shapes = [...entry.target.querySelectorAll<SVGGeometryElement>('path, circle')];
+            if (!reduced) {
+              gsap.set(shapes, { willChange: 'transform, opacity' });
+              gsap.to(shapes, { strokeDashoffset: 0, opacity: 1, scale: 1, transformOrigin: 'center', duration: 1.35, stagger: 0.08, ease: 'power2.out', onComplete: () => gsap.set(shapes, { clearProps: 'willChange' }) });
+            } else gsap.set(shapes, { clearProps: 'all' });
+            svgObserver?.unobserve(entry.target);
+          }
+        }, { threshold: 0.35 });
+        svgElements.forEach((svg) => svgObserver?.observe(svg));
+
+        activate(currentIndex, 1);
+
+        // Observer only when motion is allowed; killed on teardown / view change.
+        if (!reduced) {
+          sectionObserver = Observer.create({
+            target: window,
+            type: 'wheel,touch,pointer',
+            wheelSpeed: 1,
+            tolerance: 10,
+            lockAxis: true,
+            preventDefault: true,
+            onDown: (self) => { if (!isInteractive(self.event)) move(1, inFeatures() && currentIndex < featureEnd ? 'horizontal' : 'vertical'); },
+            onUp: (self) => { if (!isInteractive(self.event)) move(-1, inFeatures() && currentIndex > featureStart ? 'horizontal' : 'vertical'); },
+            onLeft: (self) => { if (!isInteractive(self.event) && inFeatures() && currentIndex < featureEnd) move(1, 'horizontal'); },
+            onRight: (self) => { if (!isInteractive(self.event) && inFeatures() && currentIndex > featureStart) move(-1, 'horizontal'); },
+          });
+        } else {
+          // No Observer in reduced-motion: gate the lightweight fallback
+          // wheel/touch listeners behind this branch only (no duplicates).
+          let touchX = 0;
+          let touchY = 0;
+          const fallbackWheel = (event: WheelEvent): void => {
+            if (view !== 'home' || isInteractive(event) || Math.abs(event.deltaY) < 10) return;
+            event.preventDefault();
+            const horizontal = inFeatures() && (event.deltaY !== 0 || event.deltaX !== 0);
+            const delta = event.deltaX || event.deltaY;
+            move(delta > 0 ? 1 : -1, horizontal && ((delta > 0 && currentIndex < featureEnd) || (delta < 0 && currentIndex > featureStart)) ? 'horizontal' : 'vertical');
+          };
+          const fallbackTouchStart = (event: TouchEvent): void => { touchX = event.touches[0]?.clientX ?? 0; touchY = event.touches[0]?.clientY ?? 0; };
+          const fallbackTouchEnd = (event: TouchEvent): void => {
+            if (view !== 'home' || isInteractive(event)) return;
+            const deltaX = touchX - (event.changedTouches[0]?.clientX ?? touchX);
+            const deltaY = touchY - (event.changedTouches[0]?.clientY ?? touchY);
+            if (inFeatures() && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) >= 24) move(deltaX > 0 ? 1 : -1, 'horizontal');
+            else if (Math.abs(deltaY) >= 24) move(deltaY > 0 ? 1 : -1, 'vertical');
+          };
+          window.addEventListener('wheel', fallbackWheel, { passive: false });
+          window.addEventListener('touchstart', fallbackTouchStart, { passive: true });
+          window.addEventListener('touchend', fallbackTouchEnd, { passive: true });
+          disposers.push(() => {
+            window.removeEventListener('wheel', fallbackWheel);
+            window.removeEventListener('touchstart', fallbackTouchStart);
+            window.removeEventListener('touchend', fallbackTouchEnd);
+          });
+        }
+
+        updateStory();
+        const onScroll = (): void => updateStory();
+        const onResize = (): void => updateStory();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onResize, { passive: true });
+        disposers.push(() => {
+          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('resize', onResize);
+        });
+
+        nav.slides = slides;
+        nav.move = move;
+        nav.jump = (index: number, direction: number): void => { if (!locked) activate(index, direction); };
+        nav.inFeatures = inFeatures;
+      }, page);
+
+      cleanup = () => {
+        sectionObserver?.kill();
+        svgObserver?.disconnect();
+        disposers.forEach((dispose) => dispose());
+        ctx.revert();
+        nav.move = null;
+        nav.jump = null;
+        nav.inFeatures = (): boolean => false;
+        nav.locked = false;
+        cleanup = null;
+      };
+    };
+
+    resumeHome = build;
+    leaveHome = () => { cleanup?.(); };
+
+    build();
+
+    // React to prefers-reduced-motion changes at runtime: rebuild (or not).
+    const motionChange = (event: MediaQueryListEvent): void => {
+      reduced = event.matches;
+      if (view === 'home') { leaveHome(); resumeHome(); }
+    };
     media.addEventListener('change', motionChange);
-    return () => { resumeHome = () => {}; sectionObserver.kill(); svgObserver.disconnect(); window.removeEventListener('wheel', fallbackWheel); window.removeEventListener('touchstart', fallbackTouchStart); window.removeEventListener('touchend', fallbackTouchEnd); window.removeEventListener('keydown', keyHandler); window.removeEventListener('scroll', updateStory); window.removeEventListener('resize', updateStory); media.removeEventListener('change', motionChange); };
+    return () => {
+      media.removeEventListener('change', motionChange);
+      window.removeEventListener('keydown', keyHandler);
+      leaveHome();
+      resumeHome = () => {};
+      leaveHome = () => {};
+    };
   });
 </script>
+
+<svelte:head>
+  <noscript>
+    <style>
+      /* Без JS: показываем все секции в обычном потоке, разрешаем прокрутку */
+      .page-section, .feature-section, .story-section { position: static; min-height: auto; overflow: visible; visibility: visible; opacity: 1; pointer-events: auto; }
+      .story-sticky { position: static; height: auto; }
+      body { overflow: auto; }
+    </style>
+  </noscript>
+</svelte:head>
 
 <Background />
 
@@ -244,7 +344,12 @@
   }
   .landing { width: 100%; }
   .page-section { position:fixed; inset:0; min-height:100svh; min-height:100dvh; visibility:hidden; opacity:0; pointer-events:none; overflow:auto; }
+  /* No-JS fallback: first slide visible in plain CSS; JS/GSAP overrides via inline autoAlpha + .is-active */
+  .page-section:first-of-type { visibility:visible; opacity:1; pointer-events:auto; }
   :global(.page-section.is-active) { visibility:visible; opacity:1; pointer-events:auto; }
+  /* Animated at slide level (opacity/percent transforms) by GSAP */
+  :global(.page-section) { will-change: transform, opacity; }
+  :global([data-reveal]) { will-change: transform, opacity; }
   .story-section { position:fixed; isolation:isolate; display:block; padding:0; }
   .story-sticky { position:absolute; inset:0; display:grid; place-items:center; width:100%; height:100%; }
   .story-lines { position:relative; display:grid; place-items:center; width:min(100%,1100px); height:100%; margin:0 auto; padding:clamp(30px,7vw,100px); text-align:center; }
@@ -255,7 +360,7 @@
   .hero-index, .section-number { position: absolute; right: clamp(24px, 6vw, 80px); bottom: 30px; color: var(--ink-muted); font-size: .62rem; letter-spacing: .16em; }
   .hero-index i { display: inline-block; width: 36px; margin: 0 10px 3px; border-top: 1px solid var(--accent); }
   .feature-section { position: fixed; inset: 0; isolation: isolate; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: clamp(36px, 9vw, 140px); padding: clamp(70px, 12vh, 140px) clamp(24px, 10vw, 160px); overflow: visible; }
-  .footer-slide { grid-template-columns: 1fr; justify-items: center; text-align: center; }.footer-slide .section-copy { max-width:720px; }.footer-links { display:flex; justify-content:center; flex-wrap:wrap; gap:22px; margin:34px 0 26px; }.footer-links button,.footer-links a { border:0; border-bottom:1px solid var(--accent); padding:10px 0; background:none; color:var(--ink); font:inherit; text-decoration:none; cursor:pointer; font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; }.footer-links span { margin-left:16px; }.footer-slide small { color:var(--ink-muted); font-size:.56rem; letter-spacing:.14em; }
+  .footer-slide { grid-template-columns: 1fr; justify-items: center; text-align: center; }.footer-slide .section-copy { max-width:720px; }.footer-slide .section-copy > p:not(.eyebrow) { margin-inline: auto; }.footer-links { display:flex; justify-content:center; flex-wrap:wrap; gap:22px; margin:34px 0 26px; }.footer-links button,.footer-links a { border:0; border-bottom:1px solid var(--accent); padding:10px 0; background:none; color:var(--ink); font:inherit; text-decoration:none; cursor:pointer; font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; }.footer-links span { margin-left:16px; }.footer-slide small { color:var(--ink-muted); font-size:.56rem; letter-spacing:.14em; }
   .journal { border-top: 1px solid rgba(240,245,241,.12); }
   .glass-grain { position: absolute; z-index: -1; inset: 5% 4%; border: 1px solid rgba(235,244,239,.16); border-radius: 2px; background: rgba(224,238,228,.05); box-shadow: inset 0 1px rgba(255,255,255,.12), 0 22px 90px rgba(0,0,0,.12); backdrop-filter: blur(1.5px); pointer-events: none; }
   .glass-panel { border: 1px solid rgba(229,239,231,.22); border-radius: 3px; background: rgba(224,238,228,.06); box-shadow: inset 0 1px rgba(255,255,255,.16), inset 0 -1px rgba(157,174,202,.08), 0 26px 90px rgba(0,0,0,.16); backdrop-filter: blur(14px) saturate(1.25); }
