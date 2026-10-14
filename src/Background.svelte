@@ -182,17 +182,15 @@
 
 <div class="bg" class:bg--video-on={state === 'playing'} class:bg--video-failed={state === 'failed'} aria-hidden="true">
   <div class="bg__fallback"></div>
-  <canvas bind:this={canvas} class="bg__canvas"></canvas>
 </div>
 
+<canvas bind:this={canvas} class="bg__canvas" class:bg--video-on={state === 'playing'} aria-hidden="true"></canvas>
 <div class="bg__noise" aria-hidden="true"></div>
 
 <style>
   .bg {
     position: fixed;
     inset: 0;
-    z-index: 0;
-    isolation: isolate;
     overflow: hidden;
     background: var(--bg);
   }
@@ -217,17 +215,18 @@
   }
 
   .bg__canvas {
-    position: absolute;
+    position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
     z-index: 40;
+    pointer-events: none;
     opacity: 0;
     mix-blend-mode: multiply;
     transition: opacity 1s var(--ease-out);
   }
 
-  .bg--video-on .bg__canvas {
+  .bg__canvas.bg--video-on {
     opacity: 0.6;
   }
 
