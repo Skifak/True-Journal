@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Lenis from 'lenis';
   import { gsap } from 'gsap';
   import Observer from 'gsap/Observer';
   import Background from './Background.svelte';
@@ -10,31 +9,84 @@
   let view: 'home' | 'menu' | 'about' = 'home';
   let page: HTMLElement;
   let reduced = false;
+  let resumeHome: () => void = () => {};
 
   function show(next: 'home' | 'menu' | 'about'): void {
     view = next;
+    if (next === 'home') requestAnimationFrame(() => resumeHome());
   }
 
   onMount(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     reduced = media.matches;
     gsap.registerPlugin(Observer);
-    const lenis = new Lenis({ autoRaf: false, smoothWheel: true, syncTouch: true, anchors: true, prevent: (node) => !!node.closest('input, textarea, select, [contenteditable="true"]') });
     const story = page.querySelector<HTMLElement>('[data-story-section]');
     const storyLines = story ? [...story.querySelectorAll<HTMLElement>('[data-story-line]')] : [];
-    const updateStory = (): void => {
-      if (!story || reduced || !storyLines.length) return;
-      const count = storyLines.length;
-      const storyDistance = Math.max(1, story.offsetHeight - window.innerHeight);
-      const progress = Math.max(0, Math.min(1, (window.scrollY - story.offsetTop) / storyDistance));
-      const storyProgress = Math.max(0, Math.min(1, (progress - 0.2) / 0.8));
-      storyLines.forEach((line, index) => {
-        const position = storyProgress * count - index;
-        const incoming = Math.max(0, Math.min(1, (position + 0.28) / 0.28));
-        const outgoing = Math.max(0, Math.min(1, (1.3 - position) / 0.6));
-        const opacity = Math.min(incoming, outgoing);
-        gsap.set(line, { opacity, y: (1 - incoming) * 24 - (1 - outgoing) * (window.innerHeight * 0.62) });
+    let slides = [...page.querySelectorAll<HTMLElement>('[data-page-section]')];
+    let currentIndex = 0;
+    let locked = false;
+    const isInteractive = (event: Event | undefined): boolean => {
+      const target = event?.target as HTMLElement | null;
+      return !!target?.closest('input, textarea, select, [contenteditable="true"], button, a, .menu-panel, .about-panel');
+    };
+    const reveal = (slide: HTMLElement): void => {
+      const content = slide.querySelectorAll('[data-reveal]');
+      if (reduced) { gsap.set(content, { clearProps: 'all' }); return; }
+      gsap.fromTo(content, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: .72, stagger: .1, ease: 'power3.out', overwrite: true });
+      slide.querySelectorAll<SVGGeometryElement>('path, circle').forEach((shape) => {
+        if (typeof shape.getTotalLength !== 'function') return;
+        const length = shape.getTotalLength();
+        gsap.set(shape, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
+        gsap.to(shape, { strokeDashoffset: 0, opacity: 1, duration: .95, ease: 'power2.out', overwrite: true });
       });
+    };
+    const activate = (index: number, direction = 1, axis: 'vertical' | 'horizontal' = 'vertical'): void => {
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === currentIndex);
+        slide.setAttribute('aria-hidden', i === currentIndex ? 'false' : 'true');
+        gsap.set(slide, { autoAlpha: i === currentIndex ? 1 : 0, zIndex: i === currentIndex ? 2 : 0 });
+      });
+      const active = slides[currentIndex];
+      if (!active) return;
+      active.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => {
+        element.style.opacity = '1';
+      });
+      if (!reduced) {
+        const movement = axis === 'horizontal' ? { xPercent: direction > 0 ? 10 : -10 } : { yPercent: direction > 0 ? 10 : -10 };
+        const settle = axis === 'horizontal' ? { xPercent: 0 } : { yPercent: 0 };
+        gsap.fromTo(active, { ...movement, opacity: .35 }, { ...settle, opacity: 1, duration: 1, ease: 'power3.out', overwrite: true });
+        reveal(active);
+      } else reveal(active);
+    };
+    const refreshHome = (): void => {
+      slides = [...page.querySelectorAll<HTMLElement>('[data-page-section]')];
+      if (!slides.length) return;
+      activate(currentIndex, 1);
+      updateStory();
+    };
+    const move = (direction: number, axis: 'vertical' | 'horizontal' = 'vertical'): void => {
+      if (locked || view !== 'home') return;
+      const next = currentIndex + direction;
+      if (next < 0 || next >= slides.length) return;
+      locked = true;
+      const current = slides[currentIndex];
+      const target = slides[next];
+      const timeline = gsap.timeline({ onComplete: () => { locked = false; } });
+      if (reduced) {
+        activate(next, direction);
+        locked = false;
+        return;
+      }
+      const axisProp = axis === 'horizontal' ? 'xPercent' : 'yPercent';
+      const neutralAxis = axis === 'horizontal' ? { yPercent: 0 } : { xPercent: 0 };
+      timeline.set(current, neutralAxis, 0)
+        .to(current, { [axisProp]: direction > 0 ? -10 : 10, opacity: 0, duration: .7, ease: 'power2.inOut' }, 0)
+        .add(() => { activate(next, direction, axis); gsap.set(target, { ...neutralAxis, [axisProp]: direction > 0 ? 10 : -10, opacity: 0 }); }, .22)
+        .to(target, { [axisProp]: 0, opacity: 1, duration: .95, ease: 'power3.out' }, .24);
+    };
+    const updateStory = (): void => {
+      if (!story || !storyLines.length) return;
     };
     const svgElements = [...page.querySelectorAll<SVGSVGElement>('.visual svg, .review-visual svg, .progress-ring svg')];
     const svgPaths = svgElements.flatMap((svg) => [...svg.querySelectorAll<SVGGeometryElement>('path, circle')]);
@@ -58,46 +110,59 @@
     }, { threshold: 0.35 });
     svgElements.forEach((svg) => svgObserver.observe(svg));
 
-    let sectionLocked = false;
-    const sections = (): HTMLElement[] => [...page.querySelectorAll<HTMLElement>('[data-page-section]')];
-    const currentSection = (items: HTMLElement[]): number => items.reduce((best, item, index) => Math.abs(item.getBoundingClientRect().top) < Math.abs(items[best].getBoundingClientRect().top) ? index : best, 0);
-    const atBoundary = (section: HTMLElement, direction: number): boolean => {
-      const top = section.offsetTop;
-      const bottom = top + section.offsetHeight;
-      return direction > 0 ? window.scrollY + window.innerHeight >= bottom - 3 : window.scrollY <= top + 3;
-    };
-    const moveSection = (direction: number): void => {
-      if (reduced || sectionLocked || view !== 'home') return;
-      const items = sections();
-      const current = currentSection(items);
-      const next = current + direction;
-      if (next < 0 || next >= items.length || !atBoundary(items[current], direction)) return;
-      sectionLocked = true;
-      const target = items[next];
-      const timeline = gsap.timeline({
-        onComplete: () => { sectionLocked = false; },
-      });
-      timeline.fromTo(target.querySelectorAll('[data-reveal]'), { opacity: 0, y: direction > 0 ? 24 : -24 }, { opacity: 1, y: 0, duration: .8, stagger: .1, ease: 'power3.out', overwrite: true }, 0);
-      lenis.scrollTo(target.offsetTop, { duration: .85, lock: true });
-      window.setTimeout(() => { sectionLocked = false; }, 950);
-    };
-    const sectionObserver = reduced ? null : Observer.create({
-      target: page,
+    activate(0, 1);
+    const featureStart = 5;
+    const featureEnd = 8;
+    const inFeatures = (): boolean => currentIndex >= featureStart && currentIndex <= featureEnd;
+    const sectionObserver = Observer.create({
+      target: window,
       type: 'wheel,touch,pointer',
-      tolerance: 18,
+      wheelSpeed: 1,
+      tolerance: 10,
       lockAxis: true,
-      preventDefault: false,
-      onDown: () => moveSection(1),
-      onUp: () => moveSection(-1),
+      preventDefault: true,
+      onDown: (self) => { if (!isInteractive(self.event)) move(inFeatures() && currentIndex < featureEnd ? 1 : 1, inFeatures() && currentIndex < featureEnd ? 'horizontal' : 'vertical'); },
+      onUp: (self) => { if (!isInteractive(self.event)) move(inFeatures() && currentIndex > featureStart ? -1 : -1, inFeatures() && currentIndex > featureStart ? 'horizontal' : 'vertical'); },
+      onLeft: (self) => { if (!isInteractive(self.event) && inFeatures() && currentIndex < featureEnd) move(1, 'horizontal'); },
+      onRight: (self) => { if (!isInteractive(self.event) && inFeatures() && currentIndex > featureStart) move(-1, 'horizontal'); },
     });
+    resumeHome = refreshHome;
+    let touchX = 0;
+    let touchY = 0;
+    const fallbackWheel = (event: WheelEvent): void => {
+      if (view !== 'home' || isInteractive(event) || Math.abs(event.deltaY) < 10) return;
+      event.preventDefault();
+      const horizontal = inFeatures() && (event.deltaY !== 0 || event.deltaX !== 0);
+      const delta = event.deltaX || event.deltaY;
+      move(delta > 0 ? 1 : -1, horizontal && ((delta > 0 && currentIndex < featureEnd) || (delta < 0 && currentIndex > featureStart)) ? 'horizontal' : 'vertical');
+    };
+    const fallbackTouchStart = (event: TouchEvent): void => { touchX = event.touches[0]?.clientX ?? 0; touchY = event.touches[0]?.clientY ?? 0; };
+    const fallbackTouchEnd = (event: TouchEvent): void => {
+      if (view !== 'home' || isInteractive(event)) return;
+      const deltaX = touchX - (event.changedTouches[0]?.clientX ?? touchX);
+      const deltaY = touchY - (event.changedTouches[0]?.clientY ?? touchY);
+      if (inFeatures() && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) >= 24) move(deltaX > 0 ? 1 : -1, 'horizontal');
+      else if (Math.abs(deltaY) >= 24) move(deltaY > 0 ? 1 : -1, 'vertical');
+    };
+    window.addEventListener('wheel', fallbackWheel, { passive: false });
+    window.addEventListener('touchstart', fallbackTouchStart, { passive: true });
+    window.addEventListener('touchend', fallbackTouchEnd, { passive: true });
+    const keyHandler = (event: KeyboardEvent): void => {
+      if (view !== 'home' || isInteractive(event)) return;
+      if (event.key === 'Home') { event.preventDefault(); if (!locked) activate(0, -1); return; }
+      if (event.key === 'End') { event.preventDefault(); if (!locked) activate(slides.length - 1, 1); return; }
+      const direction = ['ArrowDown', 'PageDown'].includes(event.key) ? 1 : ['ArrowUp', 'PageUp'].includes(event.key) ? -1 : 0;
+      if (inFeatures() && event.key === 'ArrowRight') { event.preventDefault(); move(1, 'horizontal'); return; }
+      if (inFeatures() && event.key === 'ArrowLeft') { event.preventDefault(); move(-1, 'horizontal'); return; }
+      if (direction) { event.preventDefault(); move(direction); }
+    };
+    window.addEventListener('keydown', keyHandler);
     updateStory();
     window.addEventListener('scroll', updateStory, { passive: true });
     window.addEventListener('resize', updateStory, { passive: true });
-    const tick = (time: number): void => lenis.raf(time * 1000);
-    gsap.ticker.add(tick); gsap.ticker.lagSmoothing(0);
     const motionChange = (event: MediaQueryListEvent): void => { reduced = event.matches; };
     media.addEventListener('change', motionChange);
-    return () => { sectionObserver?.kill(); svgObserver.disconnect(); window.removeEventListener('scroll', updateStory); window.removeEventListener('resize', updateStory); media.removeEventListener('change', motionChange); gsap.ticker.remove(tick); lenis.destroy(); };
+    return () => { resumeHome = () => {}; sectionObserver.kill(); svgObserver.disconnect(); window.removeEventListener('wheel', fallbackWheel); window.removeEventListener('touchstart', fallbackTouchStart); window.removeEventListener('touchend', fallbackTouchEnd); window.removeEventListener('keydown', keyHandler); window.removeEventListener('scroll', updateStory); window.removeEventListener('resize', updateStory); media.removeEventListener('change', motionChange); };
   });
 </script>
 
@@ -111,17 +176,11 @@
         <button class="menu-trigger" onclick={() => show('menu')} aria-expanded="false">Открыть меню <span aria-hidden="true">↗</span></button>
         <span class="hero-index">01 <i></i> 05</span>
       </section>
-      <section class="story-section page-section" data-page-section data-story-section aria-label="Что даёт торговый журнал">
-        <div class="story-sticky">
-          <div class="story-lines" aria-live="polite">
-            <p data-story-line>Открытый исходный код</p>
-            <p data-story-line>Возможность глубокого анализа твоих результатов</p>
-            <p data-story-line>Добавь помощника — свяжи ИИ с твоим журналом</p>
-            <p data-story-line>Обучающие материалы о рынках и трейдинге</p>
-          </div>
-          <span class="story-index" aria-hidden="true">TRUE JOURNAL <i>／</i> ПРИНЦИПЫ</span>
-        </div>
-      </section>
+      {#each ['Открытый исходный код', 'Возможность глубокого анализа твоих результатов', 'Добавь помощника — свяжи ИИ с твоим журналом', 'Обучающие материалы о рынках и трейдинге'] as storyLine, storyNumber}
+        <section class="story-section page-section story-slide" data-page-section aria-label={`Принцип ${storyNumber + 1}`}>
+          <div class="story-sticky"><div class="story-lines"><p data-story-line>{storyLine}</p></div><span class="story-index" aria-hidden="true">TRUE JOURNAL <i>／</i> 0{storyNumber + 1}</span></div>
+        </section>
+      {/each}
       <section class="feature-section page-section journal" data-page-section aria-labelledby="journal-title">
         <div class="glass-grain" aria-hidden="true"></div>
         <div class="section-copy" data-reveal><p class="eyebrow">01 ／ ФИКСИРУЙТЕ</p><h2 id="journal-title">Каждая сделка<br /><em>имеет значение.</em></h2><p>Записывайте входы, выходы и контекст решения. Личный торговый дневник помогает не терять детали и видеть за цифрами собственные привычки.</p><a href="mailto:hello@truejournal.ru" class="text-link">Начать вести журнал <span>↗</span></a></div>
@@ -140,8 +199,11 @@
         <span class="section-number">04 / 05</span>
       </section>
       <section class="feature-section page-section discipline" data-page-section aria-labelledby="discipline-title">
-        <div class="glass-grain" aria-hidden="true"></div><div class="discipline-visual" data-reveal aria-hidden="true"><div class="visual-label">ДИСЦИПЛИНА <span>ПОСЛЕДНИЕ 30 ДНЕЙ</span></div><div class="progress-ring"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="73"/><circle class="progress" cx="90" cy="90" r="73"/></svg><div><strong>82%</strong><span>ПЛАНА<br />СОБЛЮДЕНО</span></div></div><div class="habit-line"><span>Риск в пределах плана</span><b>24 / 27</b></div><div class="habit-line"><span>Записаны причины входа</span><b>21 / 27</b></div><div class="habit-line"><span>Итог дня подведён</span><b>18 / 27</b></div><div class="visual-foot">ПОСЛЕДОВАТЕЛЬНОСТЬ ВАЖНЕЕ ИДЕАЛА <span>↗</span></div></div>
+        <div class="glass-grain glass-panel" aria-hidden="true"></div><div class="discipline-visual" data-reveal aria-hidden="true"><div class="visual-label">ДИСЦИПЛИНА <span>ПОСЛЕДНИЕ 30 ДНЕЙ</span></div><div class="progress-ring"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="73"/><circle class="progress" cx="90" cy="90" r="73"/></svg><div><strong>82%</strong><span>ПЛАНА<br />СОБЛЮДЕНО</span></div></div><div class="habit-line"><span>Риск в пределах плана</span><b>24 / 27</b></div><div class="habit-line"><span>Записаны причины входа</span><b>21 / 27</b></div><div class="habit-line"><span>Итог дня подведён</span><b>18 / 27</b></div><div class="visual-foot">ПОСЛЕДОВАТЕЛЬНОСТЬ ВАЖНЕЕ ИДЕАЛА <span>↗</span></div></div>
         <div class="section-copy" data-reveal><p class="eyebrow">04 ／ СОБЛЮДАЙТЕ</p><h2 id="discipline-title">Прогресс — это<br /><em>верность своему плану.</em></h2><p>Отслеживайте привычки и дисциплину вместе с результатом. Статистика помогает увидеть, где вы держитесь выбранного риска, а где пора изменить подход.</p><a href="mailto:hello@truejournal.ru" class="text-link">Двигаться осознанно <span>↗</span></a></div><span class="section-number">05 / 05</span>
+      </section>
+      <section class="feature-section page-section footer-slide" data-page-section aria-labelledby="footer-title">
+        <div class="section-copy" data-reveal><p class="eyebrow">TRUE JOURNAL ／ 09</p><h2 id="footer-title">Запоминайте<br /><em>главное.</em></h2><p>Место для ясных решений — сегодня и в каждом следующем торговом дне.</p><nav class="footer-links" aria-label="Ссылки сайта"><button onclick={() => show('about')}>О журнале <span>↗</span></button><a href="mailto:hello@truejournal.ru">Связаться <span>↗</span></a></nav><small>© TRUE JOURNAL · ТОРГОВЫЙ ЖУРНАЛ СДЕЛОК</small></div>
       </section>
     </div>
   {:else if view === 'menu'}
@@ -181,22 +243,22 @@
     padding: clamp(24px, 6vw, 80px);
   }
   .landing { width: 100%; }
-  .page-section { min-height: 100svh; min-height: 100dvh; }
-  .story-section { position:relative; isolation:isolate; display:block; min-height:400svh; overflow:visible; padding:0; }
-  .story-section::before { content:''; position:absolute; z-index:-1; inset:-2px 0 auto; height:30vh; background:linear-gradient(to bottom,var(--bg),transparent); opacity:.72; pointer-events:none; }
-  .story-sticky { position:sticky; top:0; display:grid; place-items:center; width:100%; height:100svh; min-height:100dvh; }
+  .page-section { position:fixed; inset:0; min-height:100svh; min-height:100dvh; visibility:hidden; opacity:0; pointer-events:none; overflow:auto; }
+  :global(.page-section.is-active) { visibility:visible; opacity:1; pointer-events:auto; }
+  .story-section { position:fixed; isolation:isolate; display:block; padding:0; }
+  .story-sticky { position:absolute; inset:0; display:grid; place-items:center; width:100%; height:100%; }
   .story-lines { position:relative; display:grid; place-items:center; width:min(100%,1100px); height:100%; margin:0 auto; padding:clamp(30px,7vw,100px); text-align:center; }
   .story-lines p { position:absolute; width:100%; margin:0; color:var(--ink); font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(3.4rem,8vw,8rem); font-weight:400; line-height:.98; letter-spacing:-.045em; text-wrap:balance; will-change:transform,opacity; }
   .story-index { position:absolute; right:clamp(24px,6vw,80px); bottom:30px; color:var(--ink-muted); font-size:.6rem; letter-spacing:.17em; }.story-index i { margin:0 8px; color:var(--accent); font-style:normal; }
-  @media (prefers-reduced-motion: reduce) { .story-section { min-height:100svh; padding:clamp(30px,7vw,100px); }.story-sticky { position:relative; top:auto; height:auto; min-height:0; }.story-lines { display:flex; flex-direction:column; justify-content:center; gap:24px; height:auto; min-height:0; }.story-lines p { position:static; font-size:clamp(2rem,7vw,4rem); } }
+  @media (prefers-reduced-motion: reduce) { .story-lines p { font-size:clamp(2rem,7vw,4rem); } }
   .hero { position: relative; display: grid; place-content: center; justify-items: center; gap: clamp(48px, 12vh, 112px); animation: reveal 900ms var(--ease-out) both; }
   .hero-index, .section-number { position: absolute; right: clamp(24px, 6vw, 80px); bottom: 30px; color: var(--ink-muted); font-size: .62rem; letter-spacing: .16em; }
   .hero-index i { display: inline-block; width: 36px; margin: 0 10px 3px; border-top: 1px solid var(--accent); }
-  .feature-section { position: relative; isolation: isolate; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: clamp(36px, 9vw, 140px); padding: clamp(70px, 12vh, 140px) clamp(24px, 10vw, 160px); overflow: visible; }
+  .feature-section { position: fixed; inset: 0; isolation: isolate; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: clamp(36px, 9vw, 140px); padding: clamp(70px, 12vh, 140px) clamp(24px, 10vw, 160px); overflow: visible; }
+  .footer-slide { grid-template-columns: 1fr; justify-items: center; text-align: center; }.footer-slide .section-copy { max-width:720px; }.footer-links { display:flex; justify-content:center; flex-wrap:wrap; gap:22px; margin:34px 0 26px; }.footer-links button,.footer-links a { border:0; border-bottom:1px solid var(--accent); padding:10px 0; background:none; color:var(--ink); font:inherit; text-decoration:none; cursor:pointer; font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; }.footer-links span { margin-left:16px; }.footer-slide small { color:var(--ink-muted); font-size:.56rem; letter-spacing:.14em; }
   .journal { border-top: 1px solid rgba(240,245,241,.12); }
-  .journal::before, .calendar::before, .discipline::before { content: ''; position: absolute; z-index: -1; inset: -2px 0 auto; height: 30vh; background: linear-gradient(to bottom, var(--bg), transparent); opacity: .72; pointer-events: none; }
-  .glass-grain { position: absolute; z-index: -1; inset: 5% 4%; border: 1px solid rgba(235,244,239,.16); border-radius: 2px; background: linear-gradient(128deg, rgba(221,238,228,.09), rgba(215,230,220,.015) 48%, rgba(220,238,230,.055)); box-shadow: inset 0 1px rgba(255,255,255,.12), 0 22px 90px rgba(0,0,0,.12); backdrop-filter: blur(1.5px); pointer-events: none; }
-  .glass-grain::after { content: ''; position: absolute; inset: 0; opacity: .22; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"); }
+  .glass-grain { position: absolute; z-index: -1; inset: 5% 4%; border: 1px solid rgba(235,244,239,.16); border-radius: 2px; background: rgba(224,238,228,.05); box-shadow: inset 0 1px rgba(255,255,255,.12), 0 22px 90px rgba(0,0,0,.12); backdrop-filter: blur(1.5px); pointer-events: none; }
+  .glass-panel { border: 1px solid rgba(229,239,231,.22); border-radius: 3px; background: rgba(224,238,228,.06); box-shadow: inset 0 1px rgba(255,255,255,.16), inset 0 -1px rgba(157,174,202,.08), 0 26px 90px rgba(0,0,0,.16); backdrop-filter: blur(14px) saturate(1.25); }
   .section-copy { position: relative; max-width: 630px; }
   .section-copy .eyebrow { margin-bottom: 28px; }
   .section-copy h2 { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(3rem, 6.6vw, 6.8rem); font-weight: 400; letter-spacing: -.045em; line-height: .92; text-wrap: balance; }
@@ -204,14 +266,15 @@
   .section-copy > p:not(.eyebrow) { max-width: 470px; margin: 28px 0 30px; color: var(--ink-muted); font-size: clamp(.95rem, 1.3vw, 1.08rem); line-height: 1.8; }
   .text-link { display: inline-flex; gap: 24px; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--accent); color: var(--ink); text-decoration: none; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
   .text-link span { transition: transform 250ms var(--ease-out); }.text-link:hover span { transform: translate(4px,-3px); }
-  .visual, .review-visual { position: relative; width: 100%; max-width: 560px; justify-self: end; padding: clamp(22px, 4vw, 48px); border: 1px solid rgba(239,247,241,.2); background: linear-gradient(145deg, rgba(224,238,228,.12), rgba(224,238,228,.035) 55%, rgba(224,238,228,.075)); box-shadow: inset 0 1px rgba(255,255,255,.16), 0 25px 70px rgba(0,0,0,.14); backdrop-filter: blur(2px); }
+  .visual, .review-visual { position: relative; width: 100%; max-width: 560px; justify-self: end; padding: clamp(22px, 4vw, 48px); border: 1px solid rgba(239,247,241,.2); background: rgba(224,238,228,.06); box-shadow: inset 0 1px rgba(255,255,255,.16), 0 25px 70px rgba(0,0,0,.14); backdrop-filter: blur(2px); }
   .visual-label, .visual-foot, .chart-caption, .week { display:flex; justify-content:space-between; color:rgba(229,239,231,.67); font-size:.59rem; letter-spacing:.14em; }
   .visual-label { padding-bottom: 22px; border-bottom:1px solid rgba(255,255,255,.16); }.visual-label span { color:#b8d3c0; }
   .trade-row { display:grid; grid-template-columns:1fr 1.3fr auto; align-items:center; gap:10px; padding:20px 0; border-bottom:1px solid rgba(255,255,255,.12); font-size:.7rem; letter-spacing:.06em; }
   .trade-row b { color:var(--ink); font-weight:500; }.trade-row span { color:var(--ink-muted); }.trade-row strong { color:#c0d7c6; font-weight:400; }.trade-row.muted { opacity:.55; }
   .visual svg { display:block; width:100%; margin:22px 0; overflow:visible; }.visual-foot { padding-top:18px; border-top:1px solid rgba(255,255,255,.14); }.visual-foot span { font-size:1rem; }
   .review { grid-template-columns: .95fr 1.05fr; }.review-visual { justify-self:start; }.review-visual svg { width:100%; display:block; }.chart-caption { margin-top:24px; }.chart-caption span:last-child { color:#c8decf; }.chart-caption i { font-style:normal; }.week { margin-top:18px; opacity:.56; }
-  .calendar-visual, .discipline-visual { position:relative; width:100%; max-width:520px; justify-self:end; padding:clamp(22px,4vw,42px); border:1px solid rgba(239,247,241,.2); background:linear-gradient(145deg,rgba(224,238,228,.12),rgba(224,238,228,.035) 55%,rgba(224,238,228,.075)); box-shadow:inset 0 1px rgba(255,255,255,.16),0 25px 70px rgba(0,0,0,.14); backdrop-filter:blur(2px); }
+  .feature-section { background: rgba(224,238,228,.06); }
+  .calendar-visual, .discipline-visual { position:relative; width:100%; max-width:520px; justify-self:end; padding:clamp(22px,4vw,42px); border:1px solid rgba(239,247,241,.2); background:rgba(224,238,228,.06); box-shadow:inset 0 1px rgba(255,255,255,.16),0 25px 70px rgba(0,0,0,.14); backdrop-filter:blur(2px); }
   .calendar-head { display:flex; justify-content:space-between; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,.17); color:var(--ink); font-size:.67rem; letter-spacing:.14em; }
   .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; }.calendar-grid > span { padding:18px 0 12px; color:var(--ink-muted); font-size:.58rem; }.calendar-grid b { position:relative; padding:11px 0; color:rgba(241,245,240,.75); font-size:.72rem; font-weight:400; }.calendar-grid .day-muted { opacity:.3; }.calendar-grid .day-mark::after { content:''; position:absolute; left:50%; bottom:4px; width:4px; height:4px; border-radius:50%; background:#c2d9ca; transform:translateX(-50%); }.calendar-grid .day-mark i { position:absolute; inset:3px 7px; border:1px solid rgba(194,217,202,.42); border-radius:50%; }
   .calendar-note { display:grid; gap:10px; margin-top:17px; padding-top:19px; border-top:1px solid rgba(255,255,255,.14); }.calendar-note span { color:var(--ink-muted); font-size:.58rem; letter-spacing:.13em; }.calendar-note strong { color:var(--ink); font-size:.76rem; font-weight:400; }.calendar-note i { color:#c2d9ca; font-style:normal; }

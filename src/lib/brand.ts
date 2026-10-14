@@ -5,6 +5,6 @@ export interface Brand {
 }
 
 export const BRAND: Brand = {
-  name: 'True Jornal',
+  name: 'True Journal',
   tagline: 'твой инструмент. твой ассистент. твой тыл.',
 } as const;
