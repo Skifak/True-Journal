@@ -11,7 +11,7 @@
       <mask id="brand-mark-cutouts" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
         <rect width="100" height="100" fill="black" />
         <path d="M10 92 L10 66 L32 66 L32 48 L54 48 L54 30 L76 30 L76 12 L92 12 L92 92 Z" fill="white" />
-        <path d="M24 86 V73 M46 86 V55 M68 86 V37" fill="none" stroke="black" stroke-width="4" stroke-linecap="butt" />
+        <path d="M30 86 V73 M52 86 V55 M74 86 V37" fill="none" stroke="black" stroke-width="4" stroke-linecap="butt" />
       </mask>
     </defs>
     <path d="M10 92 L10 66 L32 66 L32 48 L54 48 L54 30 L76 30 L76 12 L92 12 L92 92 Z" mask="url(#brand-mark-cutouts)" />
