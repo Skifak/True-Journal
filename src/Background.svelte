@@ -206,7 +206,7 @@
     mix-blend-mode: normal;
     background-image: url('/assets/noise.png');
     background-repeat: repeat;
-    background-size: auto;
+    background-size: 239px 239px;
   }
 
   .bg__fallback {

@@ -20,9 +20,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(20px, 4vw, 40px);
+    gap: clamp(16px, 3.5vw, 28px);
     text-align: center;
     animation: brand-in 1.4s var(--ease-out) both;
+    max-width: 100%;
   }
 
   @keyframes brand-in {
@@ -46,18 +47,28 @@
 
   /* Pale-leaf с прозрачностью: анимированный фон виден сквозь буквы */
   .brand__name {
-    font-size: clamp(2.6rem, 8vw, 5.5rem);
-    line-height: 1;
-    letter-spacing: 0.04em;
+    font-size: clamp(2.4rem, 6.2vw, 5rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: 0.015em;
     color: var(--ink);
     text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+    font-kerning: normal;
+    font-variant-ligatures: common-ligatures;
+    text-wrap: balance;
+    max-width: 100%;
   }
 
   .brand__tagline {
-    font-size: clamp(1.1rem, 2.6vw, 1.6rem);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    line-height: 1.25;
+    letter-spacing: 0.045em;
+    font-weight: 400;
+    text-transform: none;
     color: var(--ink-muted);
+    max-width: 32ch;
+    text-wrap: balance;
   }
 
   @media (prefers-reduced-motion: reduce) {

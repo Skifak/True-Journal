@@ -29,6 +29,7 @@
   /* Muted cold-blue accent */
   --accent: rgba(100, 137, 180, 0.55);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
 }
 
 /* ---------- База ---------- */
@@ -46,7 +47,7 @@ body {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-display);
   overflow: hidden;
 }
 #app {
