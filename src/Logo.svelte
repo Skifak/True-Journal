@@ -41,6 +41,7 @@
   .brand__mark {
     width: clamp(72px, 12vw, 120px);
     height: auto;
+    opacity: 0.7;
     fill: rgba(243, 242, 240, 0.7);
     filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.35));
   }
@@ -57,6 +58,7 @@
     font-variant-ligatures: common-ligatures;
     text-wrap: balance;
     max-width: 100%;
+    opacity: 0.7;
   }
 
   .brand__tagline {
@@ -69,6 +71,7 @@
     color: var(--ink-muted);
     max-width: 32ch;
     text-wrap: balance;
+    opacity: 0.7;
   }
 
   @media (prefers-reduced-motion: reduce) {
