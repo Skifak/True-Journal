@@ -20,18 +20,14 @@
 
 /* ---------- Переменные (палитра по мотивам lefos.com) ---------- */
 :root {
-  /* Глубокий botanical night: почти чёрно-зелёный фон */
-  --bg: #0a120d;
+  /* Глубокий navy-фон: почти чёрный, с холодным синим подтоном */
+  --bg: #161819;
   /* Светлый pale-leaf текст — полупрозрачный, чтобы фон просвечивал */
   --ink: rgba(243, 242, 240, 0.82);
-  /* Sage secondary — тоже с прозрачностью */
-  --ink-muted: rgba(163, 164, 115, 0.75);
-  /* Muted green accent */
-  --accent: rgba(93, 150, 103, 0.55);
-  /* Глубокое затемнение поверх видео: приглушает светлые области, тени остаются */
-  --veil: rgba(5, 10, 7, 0.62);
-  /* Процедурный noise (256px tile, SVG feTurbulence, без внешних ассетов) */
-  --noise-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Приглушённый steel-blue secondary — тоже с прозрачностью */
+  --ink-muted: rgba(157, 174, 202, 0.75);
+  /* Muted cold-blue accent */
+  --accent: rgba(100, 137, 180, 0.55);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 

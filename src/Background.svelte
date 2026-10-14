@@ -2,142 +2,233 @@
   import { onMount } from 'svelte';
   import { BACKGROUND_SOURCES } from './lib/background';
 
-  // Состояния фоновой видеозаписи: не начато / играет / не удалось загрузить.
-  type VideoState = 'idle' | 'playing' | 'failed';
+  let canvas: HTMLCanvasElement;
+  let state: 'idle' | 'playing' | 'failed' = 'idle';
 
-  let videoEl: HTMLVideoElement | undefined;
-  let state: VideoState = 'idle';
-  let sourceErrors = 0;
+  const vertexShader = `
+    attribute vec2 position;
+    varying vec2 uv;
+    void main() {
+      uv = position * 0.5 + 0.5;
+      gl_Position = vec4(position, 0.0, 1.0);
+    }
+  `;
 
-  const totalSources = BACKGROUND_SOURCES.length;
+  const fragmentShader = `
+    precision mediump float;
+    uniform sampler2D frame;
+    uniform vec2 viewport;
+    uniform vec2 videoSize;
+    varying vec2 uv;
+    void main() {
+      float scale = max(viewport.x / videoSize.x, viewport.y / videoSize.y);
+      vec2 fitted = videoSize * scale;
+      vec2 visible = min(vec2(1.0), viewport / fitted);
+      vec2 sampleUv = (1.0 - visible) * 0.5 + uv * visible;
+      gl_FragColor = texture2D(frame, sampleUv);
+    }
+  `;
 
-  /** Видео готово — проявляем поверх статичной подложки. */
-  function onReady(): void {
-    state = 'playing';
-  }
-
-  /** Ни один источник не загрузился — остаётся CSS-подложка. */
-  function onSourceError(): void {
-    sourceErrors += 1;
-    if (sourceErrors >= totalSources) state = 'failed';
-  }
-
-  function onVideoError(): void {
-    state = 'failed';
-  }
-
-  function kick(): void {
-    if (!videoEl || state !== 'playing') return;
-    const p = videoEl.play();
-    if (p && typeof p.catch === 'function') p.catch(() => {});
+  function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
+    const shader = gl.createShader(type);
+    if (!shader) throw new Error('WebGL shader allocation failed');
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      const message = gl.getShaderInfoLog(shader) || 'WebGL shader compilation failed';
+      gl.deleteShader(shader);
+      throw new Error(message);
+    }
+    return shader;
   }
 
   onMount(() => {
-    // Страховка: если видео не готово за 6 секунд — считаем фон подложкой.
-    const timer = window.setTimeout(() => {
-      if (videoEl && videoEl.readyState < 2 && state === 'idle') state = 'failed';
-    }, 6000);
-    window.addEventListener('pointerdown', kick, { once: true });
-    window.addEventListener('keydown', kick, { once: true });
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener('pointerdown', kick);
-      window.removeEventListener('keydown', kick);
-    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      state = 'failed';
+      return;
+    }
+
+    const gl = canvas.getContext('webgl', {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      premultipliedAlpha: false,
+      powerPreference: 'low-power',
+    });
+    if (!gl) {
+      state = 'failed';
+      return;
+    }
+
+    let animationFrame = 0;
+    let disposed = false;
+    let texture: WebGLTexture | null = null;
+    let video: HTMLVideoElement | null = null;
+    let loaded = false;
+
+    try {
+      const vertex = compileShader(gl, gl.VERTEX_SHADER, vertexShader);
+      const fragment = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShader);
+      const program = gl.createProgram();
+      if (!program) throw new Error('WebGL program allocation failed');
+      gl.attachShader(program, vertex);
+      gl.attachShader(program, fragment);
+      gl.linkProgram(program);
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error(gl.getProgramInfoLog(program) || 'WebGL program link failed');
+      }
+      gl.useProgram(program);
+
+      const buffer = gl.createBuffer();
+      if (!buffer) throw new Error('WebGL buffer allocation failed');
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      const position = gl.getAttribLocation(program, 'position');
+      gl.enableVertexAttribArray(position);
+      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+      texture = gl.createTexture();
+      if (!texture) throw new Error('WebGL texture allocation failed');
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      // DOM video frames start at the top-left; flip rows to match WebGL's UV origin.
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.uniform1i(gl.getUniformLocation(program, 'frame'), 0);
+
+      const viewportUniform = gl.getUniformLocation(program, 'viewport');
+      const videoSizeUniform = gl.getUniformLocation(program, 'videoSize');
+      const resize = (): void => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 3);
+        const width = Math.max(1, Math.round(window.innerWidth * dpr));
+        const height = Math.max(1, Math.round(window.innerHeight * dpr));
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+          gl.viewport(0, 0, width, height);
+          gl.uniform2f(viewportUniform, width, height);
+        }
+      };
+      resize();
+
+      const draw = (): void => {
+        if (disposed) return;
+        resize();
+        if (loaded && video && texture && video.videoWidth && video.videoHeight) {
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.uniform2f(videoSizeUniform, video.videoWidth, video.videoHeight);
+          try {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          } catch {
+            state = 'failed';
+          }
+        }
+        animationFrame = window.requestAnimationFrame(draw);
+      };
+
+      video = document.createElement('video');
+      video.muted = true;
+      video.loop = true;
+      video.autoplay = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.crossOrigin = 'anonymous';
+      let sourceIndex = 0;
+
+      const tryNextSource = (): void => {
+        if (!video || sourceIndex >= BACKGROUND_SOURCES.length) {
+          state = 'failed';
+          return;
+        }
+        video.src = BACKGROUND_SOURCES[sourceIndex].src;
+        sourceIndex += 1;
+        video.load();
+      };
+
+      video.addEventListener('loadeddata', () => {
+        loaded = true;
+        state = 'playing';
+        void video?.play().catch(() => {});
+      });
+      video.addEventListener('error', tryNextSource);
+      tryNextSource();
+      window.addEventListener('resize', resize, { passive: true });
+      animationFrame = window.requestAnimationFrame(draw);
+
+      return () => {
+        disposed = true;
+        window.cancelAnimationFrame(animationFrame);
+        window.removeEventListener('resize', resize);
+        if (video) {
+          video.pause();
+          video.removeAttribute('src');
+          video.load();
+        }
+        if (texture) gl.deleteTexture(texture);
+        gl.getExtension('WEBGL_lose_context')?.loseContext();
+      };
+    } catch {
+      state = 'failed';
+    }
   });
 </script>
 
 <div class="bg" class:bg--video-on={state === 'playing'} class:bg--video-failed={state === 'failed'} aria-hidden="true">
   <div class="bg__fallback"></div>
-  {#if state !== 'failed'}
-    <video
-      class="bg__video"
-      bind:this={videoEl}
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="auto"
-      tabindex="-1"
-      on:loadeddata={onReady}
-      on:error={onVideoError}
-    >
-      {#each BACKGROUND_SOURCES as source (source.src)}
-        <source src={source.src} type={source.type} on:error={onSourceError} />
-      {/each}
-    </video>
-  {/if}
-  <div class="bg__veil"></div>
-  <div class="bg__noise"></div>
+  <canvas bind:this={canvas} class="bg__canvas"></canvas>
 </div>
+
+<div class="bg__noise" aria-hidden="true"></div>
 
 <style>
   .bg {
     position: fixed;
     inset: 0;
     z-index: 0;
+    isolation: isolate;
     overflow: hidden;
     background: var(--bg);
   }
 
-  /* Контрастная подложка: видна, пока видео не стартовало / если оно не загрузилось */
+  .bg__noise {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    transform: translateZ(0);
+    mix-blend-mode: normal;
+    background-image: url('/assets/noise.png');
+    background-repeat: repeat;
+    background-size: auto;
+  }
+
   .bg__fallback {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(120% 90% at 30% 20%, rgba(163, 164, 115, 0.08), transparent 60%),
-      radial-gradient(100% 80% at 75% 85%, rgba(93, 150, 103, 0.1), transparent 55%),
-      linear-gradient(160deg, #0d1710 0%, #0a120d 55%, #101d13 100%);
+    z-index: 0;
+    background: #161819;
   }
 
-  .bg__video {
+  .bg__canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    z-index: 40;
     opacity: 0;
-    transition: opacity 1.2s var(--ease-out);
-    /* Мягкие рассеянные края вместо пиксельной резкости:
-       blur сглаживает фактуру, scale компенсирует светлые кромки */
-    filter: blur(7px) saturate(0.92);
-    transform: scale(1.07);
-    transform-origin: center;
-    will-change: filter, transform;
+    mix-blend-mode: multiply;
+    transition: opacity 1s var(--ease-out);
   }
 
-  .bg--video-on .bg__video {
-    opacity: 1;
+  .bg--video-on .bg__canvas {
+    opacity: 0.6;
   }
 
-  .bg--video-failed .bg__video {
-    display: none;
-  }
-
-  /* Глубокое почти чёрно-зелёное затемнение: светлые области гаснут,
-     тени остаются читаемыми. Сам логотип не затрагивает. */
-  .bg__veil {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(120% 100% at 50% 42%, transparent 0%, rgba(5, 10, 7, 0.28) 100%),
-      var(--veil);
-  }
-
-  /* Процедурный noise: статичный 256px tile, ~3% alpha, под тени видео */
-  .bg__noise {
-    position: absolute;
-    inset: 0;
-    background: var(--noise-tile) repeat;
-    background-size: 256px 256px;
-    opacity: 0.03;
-    pointer-events: none;
-    mix-blend-mode: overlay;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .bg__video {
-      display: none;
-    }
-  }
 </style>
