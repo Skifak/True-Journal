@@ -2,7 +2,7 @@
   import type { Brand } from './lib/brand';
 
   /** Типизированные props с значениями по умолчанию. */
-  export let brand: Brand = { name: 'TradeJournal', tagline: 'торговый журнал сделок' };
+  export let brand: Brand = { name: 'True*Jornal', tagline: 'торговый журнал сделок' };
 </script>
 
 <h1 class="brand">
@@ -55,6 +55,7 @@
 
   /* Pale-leaf с прозрачностью: анимированный фон виден сквозь буквы */
   .brand__name {
+    font-family: 'Unbounded', sans-serif;
     font-size: clamp(2.4rem, 6.2vw, 5rem);
     font-weight: 400;
     line-height: 0.98;
@@ -70,14 +71,15 @@
 
   .brand__tagline {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    font-size: clamp(0.65rem, 2.2vw, 1.4rem);
     line-height: 1.25;
     letter-spacing: 0.045em;
     font-weight: 400;
     text-transform: none;
     color: var(--ink-muted);
-    max-width: 32ch;
-    text-wrap: balance;
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
     opacity: 0.7;
   }
 

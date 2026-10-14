@@ -1,10 +1,10 @@
-/** Данные логотипа TradeJournal. */
+/** Данные логотипа True*Jornal. */
 export interface Brand {
   readonly name: string;
   readonly tagline: string;
 }
 
 export const BRAND: Brand = {
-  name: 'TradeJournal',
-  tagline: 'торговый журнал сделок',
+  name: 'True Jornal',
+  tagline: 'твой инструмент. твой ассистент. твой тыл.',
 } as const;
