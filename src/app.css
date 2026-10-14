@@ -1,0 +1,76 @@
+/* TradeJournal — глобальные стили: переменные, база, доступность */
+
+/* ---------- Шрифт (локальный, для логотипа) ---------- */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/cormorant-garamond-400-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/cormorant-garamond-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ---------- Переменные (палитра по мотивам lefos.com) ---------- */
+:root {
+  /* Глубокий botanical night: почти чёрно-зелёный фон */
+  --bg: #0a120d;
+  /* Светлый pale-leaf текст — полупрозрачный, чтобы фон просвечивал */
+  --ink: rgba(243, 242, 240, 0.82);
+  /* Sage secondary — тоже с прозрачностью */
+  --ink-muted: rgba(163, 164, 115, 0.75);
+  /* Muted green accent */
+  --accent: rgba(93, 150, 103, 0.55);
+  /* Глубокое затемнение поверх видео: приглушает светлые области, тени остаются */
+  --veil: rgba(5, 10, 7, 0.62);
+  /* Процедурный noise (256px tile, SVG feTurbulence, без внешних ассетов) */
+  --noise-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- База ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  overflow: hidden;
+}
+#app {
+  height: 100%;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  body {
+    overflow: auto;
+  }
+}

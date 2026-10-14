@@ -1,0 +1,1490 @@
+{
+ "url": "index.html",
+ "at": "2026-10-14T07:01:03.719Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 6,
+   "filled": [
+    0.17,
+    0.18,
+    0.36,
+    0.41,
+    0.42,
+    0.57
+   ],
+   "motion": {
+    "elements": 21,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 21,
+    "videos": 1,
+    "playingVideos": 1
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 4896,
+     "screens": 5.4,
+     "words": 313,
+     "img": 3,
+     "video": 1,
+     "canvas": 1,
+     "svg": 1,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 1,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 1,
+     "pictureSamples": [
+      "account-book-of-thomas-mister.jpg",
+      "stock-ticker.jpg",
+      "ny-stock-exchange-traders-floor-lc-u9.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": []
+    },
+    "hero": {
+     "text": "Дисциплина начинается с журнала",
+     "words": 4,
+     "chars": 31,
+     "lines": 3,
+     "size": 89.3,
+     "vw": 6.2,
+     "font": "Cormorant Garamond",
+     "weight": 400,
+     "tracking": -0.02,
+     "leading": 0.98,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.35,
+     "top": 228,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Дисциплина начинается с журнала",
+     "words": 4,
+     "lines": 3,
+     "size": 89.3,
+     "font": "Cormorant Garamond"
+    },
+    "headings": [
+     {
+      "text": "Дисциплина начинается с журнала",
+      "words": 4,
+      "chars": 31,
+      "lines": 3,
+      "size": 89.3,
+      "vw": 6.2,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.98,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 228,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Сделки забываются. Записи остаются.",
+      "words": 4,
+      "chars": 35,
+      "lines": 2,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.47,
+      "top": 1073,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "З",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 78,
+      "vw": 5.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.03,
+      "top": 1279,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "С",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 78,
+      "vw": 5.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.04,
+      "top": 1279,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Д",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 78,
+      "vw": 5.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.04,
+      "top": 1279,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Каждая сделка оставляет след",
+      "words": 4,
+      "chars": 28,
+      "lines": 2,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.34,
+      "top": 1972,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Учёт старше рынков, на которых ты торгуешь",
+      "words": 7,
+      "chars": 42,
+      "lines": 2,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.51,
+      "top": 2965,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Журнал открыт",
+      "words": 2,
+      "chars": 13,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.27,
+      "top": 4069,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "TradeJournal",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 172.8,
+      "vw": 12,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.8,
+      "top": 4565,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 9,
+     "maxLines": 3,
+     "over2Lines": 1,
+     "statements": 4,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Cormorant Garamond",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Arial",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      16,
+      17,
+      19,
+      20,
+      26,
+      64,
+      78,
+      89,
+      173
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "Cormorant Garamond",
+      "size": 14,
+      "leading": 1.45,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.4
+     },
+     "measureChars": 67,
+     "max": {
+      "size": 172.8,
+      "vw": 12,
+      "font": "Cormorant Garamond",
+      "text": "TradeJournal"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.02,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#070d09",
+     "bodyBgHsl": {
+      "h": 140,
+      "s": 0.3,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0b140f",
+       "top": 0,
+       "hsl": {
+        "h": 147,
+        "s": 0.29,
+        "l": 0.06
+       }
+      },
+      {
+       "color": "#040805",
+       "top": 0,
+       "hsl": {
+        "h": 135,
+        "s": 0.33,
+        "l": 0.02
+       }
+      },
+      {
+       "color": "#101b14",
+       "top": 3997,
+       "hsl": {
+        "h": 142,
+        "s": 0.26,
+        "l": 0.08
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9eee4",
+       "share": 0.65
+      },
+      {
+       "color": "#aab8a0",
+       "share": 0.31
+      },
+      {
+       "color": "#070d09",
+       "share": 0.03
+      },
+      {
+       "color": "#c8d8ae",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#c8d8ae",
+      "hsl": {
+       "h": 83,
+       "s": 0.35,
+       "l": 0.76
+      },
+      "fg": "#070d09"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 3,
+     "radius": 0,
+     "height": 48,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Скачать",
+      "Скачать TradeJournal",
+      "Меню Закрыть"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 4,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 1
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": false,
+     "height": 74,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "cormorant garamond"
+    ]
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 6,
+   "filled": [
+    0.1,
+    0.3,
+    0.76,
+    0.78,
+    0.52,
+    0.53
+   ],
+   "motion": {
+    "elements": 21,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 21,
+    "videos": 1,
+    "playingVideos": 1
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 5171,
+     "screens": 5,
+     "words": 313,
+     "img": 3,
+     "video": 1,
+     "canvas": 1,
+     "svg": 1,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 1,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 1,
+     "pictureSamples": [
+      "account-book-of-thomas-mister.jpg",
+      "stock-ticker.jpg",
+      "ny-stock-exchange-traders-floor-lc-u9.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": []
+    },
+    "hero": {
+     "text": "Дисциплина начинается с журнала",
+     "words": 4,
+     "chars": 31,
+     "lines": 3,
+     "size": 54.3,
+     "vw": 7.1,
+     "font": "Cormorant Garamond",
+     "weight": 400,
+     "tracking": -0.02,
+     "leading": 0.98,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.4,
+     "top": 348,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Дисциплина начинается с журнала",
+     "words": 4,
+     "lines": 3,
+     "size": 54.3,
+     "font": "Cormorant Garamond"
+    },
+    "headings": [
+     {
+      "text": "Дисциплина начинается с журнала",
+      "words": 4,
+      "chars": 31,
+      "lines": 3,
+      "size": 54.3,
+      "vw": 7.1,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.98,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 348,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Сделки забываются. Записи остаются.",
+      "words": 4,
+      "chars": 35,
+      "lines": 2,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.62,
+      "top": 1116,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "З",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 68.9,
+      "vw": 9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.05,
+      "top": 1258,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "С",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 68.9,
+      "vw": 9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.06,
+      "top": 1258,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Д",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 68.9,
+      "vw": 9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.07,
+      "top": 1429,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Каждая сделка оставляет след",
+      "words": 4,
+      "chars": 28,
+      "lines": 2,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.51,
+      "top": 1996,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Учёт старше рынков, на которых ты торгуешь",
+      "words": 7,
+      "chars": 42,
+      "lines": 2,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.68,
+      "top": 3172,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Журнал открыт",
+      "words": 2,
+      "chars": 13,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.36,
+      "top": 4541,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "TradeJournal",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 92.2,
+      "vw": 12,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.96,
+      "top": 4916,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 9,
+     "maxLines": 3,
+     "over2Lines": 1,
+     "statements": 4,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Cormorant Garamond",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Arial",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      16,
+      17,
+      18,
+      20,
+      23,
+      24,
+      45,
+      54,
+      69,
+      92
+     ],
+     "sizeCount": 11,
+     "notLoaded": [],
+     "body": {
+      "font": "Cormorant Garamond",
+      "size": 23,
+      "leading": 1.4,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 16.6
+     },
+     "measureChars": 67,
+     "max": {
+      "size": 92.2,
+      "vw": 12,
+      "font": "Cormorant Garamond",
+      "text": "TradeJournal"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.02,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#070d09",
+     "bodyBgHsl": {
+      "h": 140,
+      "s": 0.3,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0b140f",
+       "top": 0,
+       "hsl": {
+        "h": 147,
+        "s": 0.29,
+        "l": 0.06
+       }
+      },
+      {
+       "color": "#040805",
+       "top": 0,
+       "hsl": {
+        "h": 135,
+        "s": 0.33,
+        "l": 0.02
+       }
+      },
+      {
+       "color": "#101b14",
+       "top": 2628,
+       "hsl": {
+        "h": 142,
+        "s": 0.26,
+        "l": 0.08
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9eee4",
+       "share": 0.65
+      },
+      {
+       "color": "#aab8a0",
+       "share": 0.31
+      },
+      {
+       "color": "#070d09",
+       "share": 0.03
+      },
+      {
+       "color": "#c8d8ae",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#c8d8ae",
+      "hsl": {
+       "h": 83,
+       "s": 0.35,
+       "l": 0.76
+      },
+      "fg": "#070d09"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 3,
+     "radius": 0,
+     "height": 48,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Скачать",
+      "Скачать TradeJournal",
+      "Меню Закрыть"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 4,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 1
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": false,
+     "height": 74,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "cormorant garamond"
+    ]
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 6,
+   "filled": [
+    0.19,
+    0.46,
+    0.63,
+    0.59,
+    0.68,
+    0.59
+   ],
+   "motion": {
+    "elements": 21,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 21,
+    "videos": 1,
+    "playingVideos": 1
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 4428,
+     "screens": 5.2,
+     "words": 309,
+     "img": 3,
+     "video": 1,
+     "canvas": 1,
+     "svg": 1,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 1,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 1,
+     "pictureSamples": [
+      "account-book-of-thomas-mister.jpg",
+      "stock-ticker.jpg",
+      "ny-stock-exchange-traders-floor-lc-u9.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": []
+    },
+    "hero": {
+     "text": "Дисциплина начинается с журнала",
+     "words": 4,
+     "chars": 31,
+     "lines": 3,
+     "size": 34.7,
+     "vw": 8.9,
+     "font": "Cormorant Garamond",
+     "weight": 400,
+     "tracking": -0.02,
+     "leading": 0.98,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.51,
+     "top": 292,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Дисциплина начинается с журнала",
+     "words": 4,
+     "lines": 3,
+     "size": 34.7,
+     "font": "Cormorant Garamond"
+    },
+    "headings": [
+     {
+      "text": "Дисциплина начинается с журнала",
+      "words": 4,
+      "chars": 31,
+      "lines": 3,
+      "size": 34.7,
+      "vw": 8.9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.98,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.51,
+      "top": 292,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Сделки забываются. Записи остаются.",
+      "words": 4,
+      "chars": 35,
+      "lines": 2,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 924,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "З",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 61,
+      "vw": 15.6,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.09,
+      "top": 1034,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "С",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 61,
+      "vw": 15.6,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.11,
+      "top": 1154,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Д",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 61,
+      "vw": 15.6,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 0.8,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.12,
+      "top": 1304,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Каждая сделка оставляет след",
+      "words": 4,
+      "chars": 28,
+      "lines": 2,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.73,
+      "top": 1808,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Максимальная потеря на сделку: 1 000 ₽",
+      "words": 7,
+      "chars": 38,
+      "lines": 1,
+      "size": 23,
+      "vw": 5.9,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2258,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "Учёт старше рынков, на которых ты торгуешь",
+      "words": 7,
+      "chars": 42,
+      "lines": 2,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 2925,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Журнал открыт",
+      "words": 2,
+      "chars": 13,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.53,
+      "top": 3778,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "TradeJournal",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 56,
+      "vw": 14.4,
+      "font": "Cormorant Garamond",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 4189,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 10,
+     "maxLines": 3,
+     "over2Lines": 1,
+     "statements": 5,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Cormorant Garamond",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Arial",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      16,
+      17,
+      20,
+      23,
+      33,
+      35,
+      56,
+      61
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "Cormorant Garamond",
+      "size": 20.3,
+      "leading": 1.4,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 16.6
+     },
+     "measureChars": 55,
+     "max": {
+      "size": 61,
+      "vw": 15.6,
+      "font": "Cormorant Garamond",
+      "text": "З"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.02,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#070d09",
+     "bodyBgHsl": {
+      "h": 140,
+      "s": 0.3,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0b140f",
+       "top": 0,
+       "hsl": {
+        "h": 147,
+        "s": 0.29,
+        "l": 0.06
+       }
+      },
+      {
+       "color": "#040805",
+       "top": 0,
+       "hsl": {
+        "h": 135,
+        "s": 0.33,
+        "l": 0.02
+       }
+      },
+      {
+       "color": "#101b14",
+       "top": 2043,
+       "hsl": {
+        "h": 142,
+        "s": 0.26,
+        "l": 0.08
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9eee4",
+       "share": 0.65
+      },
+      {
+       "color": "#aab8a0",
+       "share": 0.32
+      },
+      {
+       "color": "#070d09",
+       "share": 0.02
+      },
+      {
+       "color": "#c8d8ae",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#c8d8ae",
+      "hsl": {
+       "h": 83,
+       "s": 0.35,
+       "l": 0.76
+      },
+      "fg": "#070d09"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 4,
+     "inHero": 2,
+     "radius": 0,
+     "height": 48,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Скачать TradeJournal",
+      "Меню Закрыть"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 1
+     }
+    ],
+    "nav": {
+     "links": 1,
+     "fixed": false,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "cormorant garamond"
+    ]
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "FAIL",
+   "id": "headline-lines",
+   "width": 1440,
+   "message": "1 headline(s) wrap past two lines at 1440px: \"Дисциплина начинается с журнала\" → 3 lines (4 words, 89.3px)",
+   "fix": "Cut words first (a headline is a title, not a sentence). Then give it a wider measure. Lower the size only as a last resort and never below the scale you chose. A real statement paragraph belongs in a <p> or <blockquote> at 36px or less."
+  },
+  {
+   "level": "WARN",
+   "id": "size-count",
+   "width": 1440,
+   "message": "10 different font sizes (14, 16, 17, 19, 20, 26, 64, 78, 89, 173).",
+   "fix": "A page needs about five: display, heading, lead, body, small.",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "body-size",
+   "width": 1440,
+   "message": "Body text is 14px (the size most of the running text is set in).",
+   "fix": "Body copy 16–20px. Map small sizes from blueprints onto your body step."
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "FAIL",
+   "id": "covered-text",
+   "width": 1440,
+   "message": "Large text lies under another element at some scroll position: \"начинается с журнала\" (screen 1, 50% hidden)",
+   "fix": "Nothing may sit on top of a headline or statement. Move the picture, shorten the pinned run, or raise the text above it (z-index) and give it a ground.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "empty-screens",
+   "width": 1440,
+   "message": "2 of 6 desktop screens are almost empty ground (under 20% of the screen holds text, a picture or a colour field): screens 1, 2.",
+   "fix": "An empty screen is a rest only once per page. Elsewhere it means the section is underbuilt: set its content larger, give it the full information, put it on a colour field, or cut it."
+  },
+  {
+   "level": "FAIL",
+   "id": "headline-lines",
+   "width": 768,
+   "message": "1 headline(s) wrap past two lines at 768px: \"Дисциплина начинается с журнала\" → 3 lines (4 words, 54.3px)",
+   "fix": "Cut words first (a headline is a title, not a sentence). Then give it a wider measure. Lower the size only as a last resort and never below the scale you chose. A real statement paragraph belongs in a <p> or <blockquote> at 32px or less."
+  },
+  {
+   "level": "FAIL",
+   "id": "headline-lines",
+   "width": 390,
+   "message": "1 headline(s) wrap past two lines at 390px: \"Дисциплина начинается с журнала\" → 3 lines (4 words, 34.7px)",
+   "fix": "Cut words first (a headline is a title, not a sentence). Then give it a wider measure. Lower the size only as a last resort and never below the scale you chose. A real statement paragraph belongs in a <p> or <blockquote> at 24px or less."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/desktop-fold.jpg",
+   "pages": [
+    "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/desktop-page-01.jpg",
+    "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/desktop-page-02.jpg"
+   ]
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/tablet-fold.jpg",
+   "pages": [
+    "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/tablet-page-01.jpg"
+   ]
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/mobile-fold.jpg",
+   "pages": [
+    "/home/an/Projects/TradeJornalApp/journal-site/.taste-skill/inspect/mobile-page-01.jpg"
+   ]
+  }
+ ]
+}
