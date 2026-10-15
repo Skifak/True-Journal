@@ -414,7 +414,9 @@
   .story-sticky { position:absolute; inset:0; display:grid; place-items:center; width:100%; height:100%; }
   .story-lines { position:relative; display:grid; place-items:center; width:min(100%,1100px); height:100%; margin:0 auto; padding:clamp(30px,7vw,100px); text-align:center; }
   .story-lines p { position:absolute; width:100%; margin:0; color:var(--ink); font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(3.4rem,8vw,8rem); font-weight:400; line-height:.98; letter-spacing:-.045em; text-wrap:balance; will-change:transform,opacity; }
-  .slide-index { position:fixed; right:clamp(24px,6vw,80px); bottom:clamp(24px,6vw,80px); z-index:40; color:var(--ink-muted); font-size:.62rem; letter-spacing:.16em; }.slide-index i { margin:0 18px; color:var(--accent); font-style:normal; }.slide-index b { font-weight:400; color:var(--ink); }
+  /* Counter mirrors the desktop glass frame (inset 5% 4%): fixed 24px inner
+     gap to both frame edges, so right never crosses the frame line. */
+  .slide-index { position:fixed; right:calc(4% + 24px); bottom:calc(5% + 24px); z-index:40; color:var(--ink-muted); font-size:.62rem; letter-spacing:.16em; }.slide-index i { margin:0 18px; color:var(--accent); font-style:normal; }.slide-index b { font-weight:400; color:var(--ink); }
   @media (prefers-reduced-motion: reduce) { .story-lines p { font-size:clamp(2rem,7vw,4rem); } }
   .hero { position: relative; display: grid; place-content: center; justify-items: center; gap: clamp(48px, 12vh, 112px); animation: reveal 900ms var(--ease-out) both; }
   .hero { display: grid; justify-items: center; gap: clamp(48px, 12vh, 112px); animation: reveal 900ms var(--ease-out) both; }
@@ -552,6 +554,8 @@
     /* Glass frame on slides 06–09: use viewport width for every inset so the
        physical gap is equal on all sides; retain the mobile header clearance. */
     .glass-grain { inset: calc(var(--header-h, 0px) + 3vw) 3vw 3vw; }
+    /* Mobile counter keeps its previous offsets (base rule is now frame-based). */
+    .slide-index { right: clamp(24px, 6vw, 80px); bottom: clamp(24px, 6vw, 80px); }
     /* Compact header panel: logo/title + menu, pinned to the top (not shifted down). */
     .mobile-header {
       position: fixed; top: 0; left: 0; right: 0; z-index: 60;
